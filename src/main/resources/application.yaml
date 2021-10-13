@@ -1,0 +1,23 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: sensitivedata-api
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    database: POSTGRESQL
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+  datasource:
+    url: jdbc:postgresql://localhost:15432/dataprovider
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  rabbitmq:
+    username: guest
+    password: guest
+    port: '5672'
+    host: localhost
