@@ -3,7 +3,6 @@ package com.dataprovider.sensitivedataapi.service.impl;
 import com.dataprovider.sensitivedataapi.model.DebtEntity;
 import com.dataprovider.sensitivedataapi.model.SensitiveDataEntity;
 import com.dataprovider.sensitivedataapi.model.dto.SensitiveDataDto;
-import com.dataprovider.sensitivedataapi.repository.DebtRepository;
 import com.dataprovider.sensitivedataapi.repository.SensitiveDataRepository;
 import com.dataprovider.sensitivedataapi.service.SensitiveDataService;
 import java.time.LocalDateTime;
@@ -20,9 +19,6 @@ public class SensitiveDataServiceImpl implements SensitiveDataService {
 
   @Autowired
   private SensitiveDataRepository sensitiveDataRepository;
-
-  @Autowired
-  private DebtRepository debtRepository;
 
   @Override
   public SensitiveDataDto getScoreDataFromCustomer(String cpf) {
@@ -42,11 +38,12 @@ public class SensitiveDataServiceImpl implements SensitiveDataService {
   }
 
   private void updateAndSaveEntity(SensitiveDataEntity entity, SensitiveDataDto dto) {
+    //TODO fix do incremento de debitos
     Set<DebtEntity> debts = new HashSet<>();
     dto.getDebts().forEach(
         debtDto -> debts.add(DebtEntity.newInstance(debtDto, entity))
     );
-    debtRepository.deleteAll(entity.getDebts());
+
     entity.setAddress(dto.getAddress());
     entity.setCustomerName(dto.getCustomerName());
     entity.setCpf(dto.getCpf());
