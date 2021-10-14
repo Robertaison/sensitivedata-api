@@ -1,7 +1,10 @@
 package com.dataprovider.sensitivedataapi.model;
 
+import com.dataprovider.sensitivedataapi.model.dto.SensitiveDataDto;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,7 +35,20 @@ public class SensitiveDataEntity {
   private String customerName;
 
   @OneToMany(mappedBy = "sensitiveData", cascade = CascadeType.ALL)
-  private List<DebtEntity> debts;
+  private Set<DebtEntity> debts;
 
   private LocalDateTime updatedAt;
+
+  public static SensitiveDataEntity newInstance(SensitiveDataDto dto) {
+    Set<DebtEntity> debts = new HashSet<>();
+    SensitiveDataEntity sensitiveData = SensitiveDataEntity.builder()
+        .cpf(dto.getCpf())
+        .address(dto.getAddress())
+        .customerName(dto.getCustomerName())
+        .build();
+
+    dto.getDebts().forEach(debtDto -> debts.add(DebtEntity.newInstance(debtDto, sensitiveData)));
+    sensitiveData.setDebts(debts);
+    return sensitiveData;
+  }
 }

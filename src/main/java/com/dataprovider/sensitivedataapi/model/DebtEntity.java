@@ -1,5 +1,6 @@
 package com.dataprovider.sensitivedataapi.model;
 
+import com.dataprovider.sensitivedataapi.model.dto.DebtDto;
 import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -31,4 +32,15 @@ public class DebtEntity {
 
   @ManyToOne
   private SensitiveDataEntity sensitiveData;
+
+  public static DebtEntity newInstance(DebtDto debtDto, SensitiveDataEntity entity) {
+    return DebtEntity.builder()
+        .creditorName(debtDto.getCreditorName())
+        .creditorDocument(debtDto.getCreditorDocument())
+        .currentDebitAmount(debtDto.getCurrentDebitAmount())
+        .initialDebitAmount(debtDto.getInitialDebitAmount())
+        .initialData(LocalDateTime.parse(debtDto.getInitialData()))
+        .sensitiveData(entity)
+        .build();
+  }
 }
