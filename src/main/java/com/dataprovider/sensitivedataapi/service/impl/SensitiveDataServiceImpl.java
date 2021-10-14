@@ -3,6 +3,7 @@ package com.dataprovider.sensitivedataapi.service.impl;
 import com.dataprovider.sensitivedataapi.model.DebtEntity;
 import com.dataprovider.sensitivedataapi.model.SensitiveDataEntity;
 import com.dataprovider.sensitivedataapi.model.dto.SensitiveDataDto;
+import com.dataprovider.sensitivedataapi.repository.DebtRepository;
 import com.dataprovider.sensitivedataapi.repository.SensitiveDataRepository;
 import com.dataprovider.sensitivedataapi.service.SensitiveDataService;
 import java.time.LocalDateTime;
@@ -18,22 +19,25 @@ import org.springframework.stereotype.Service;
 public class SensitiveDataServiceImpl implements SensitiveDataService {
 
   @Autowired
-  private SensitiveDataRepository repository;
+  private SensitiveDataRepository sensitiveDataRepository;
+
+  @Autowired
+  private DebtRepository debtRepository;
 
   @Override
   public SensitiveDataDto getScoreDataFromCustomer(String cpf) {
     log.info("M=ScoreDataService.getScoreDataFromCustomer, cpf={}", cpf);
-    Optional<SensitiveDataEntity> sensitiveData = repository.findByCpf(cpf);
+    Optional<SensitiveDataEntity> sensitiveData = sensitiveDataRepository.findByCpf(cpf);
     return sensitiveData.map(SensitiveDataDto::newInstance).orElse(null);
   }
 
   @Override
   public void saveUpdateDataFromCustomer(SensitiveDataDto dto) {
     log.info("M=ScoreDataService.saveUpdateDataFromCustomer, received dto={}", dto);
-    Optional<SensitiveDataEntity> entityOptional = repository.findByCpf(dto.getCpf());
+    Optional<SensitiveDataEntity> entityOptional = sensitiveDataRepository.findByCpf(dto.getCpf());
     entityOptional.ifPresentOrElse(
         entity -> updateAndSaveEntity(entity, dto),
-        () -> repository.save(SensitiveDataEntity.newInstance(dto))
+        () -> sensitiveDataRepository.save(SensitiveDataEntity.newInstance(dto))
     );
   }
 
@@ -42,11 +46,12 @@ public class SensitiveDataServiceImpl implements SensitiveDataService {
     dto.getDebts().forEach(
         debtDto -> debts.add(DebtEntity.newInstance(debtDto, entity))
     );
-
+    debtRepository.deleteAll(entity.getDebts());
     entity.setAddress(dto.getAddress());
     entity.setCustomerName(dto.getCustomerName());
     entity.setCpf(dto.getCpf());
     entity.setDebts(debts);
-    repository.saveAndFlush(entity);
+    entity.setUpdatedAt(LocalDateTime.parse(dto.getUpdatedAt()));
+    sensitiveDataRepository.saveAndFlush(entity);
   }
 }

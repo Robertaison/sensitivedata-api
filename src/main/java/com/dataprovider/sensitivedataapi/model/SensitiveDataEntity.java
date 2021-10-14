@@ -3,11 +3,10 @@ package com.dataprovider.sensitivedataapi.model;
 import com.dataprovider.sensitivedataapi.model.dto.SensitiveDataDto;
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -34,7 +33,7 @@ public class SensitiveDataEntity {
   private String address;
   private String customerName;
 
-  @OneToMany(mappedBy = "sensitiveData", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "sensitiveData", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   private Set<DebtEntity> debts;
 
   private LocalDateTime updatedAt;
@@ -45,6 +44,7 @@ public class SensitiveDataEntity {
         .cpf(dto.getCpf())
         .address(dto.getAddress())
         .customerName(dto.getCustomerName())
+        .updatedAt(LocalDateTime.parse(dto.getUpdatedAt()))
         .build();
 
     dto.getDebts().forEach(debtDto -> debts.add(DebtEntity.newInstance(debtDto, sensitiveData)));
